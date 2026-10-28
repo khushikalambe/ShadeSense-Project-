@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrueHue — Colorblindness Testing Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════ RESET & VARIABLES ═══════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f2ede6;--bg2:#e8e0d5;--bg3:#faf7f3;
+  --card:#ffffff;--card2:#fdf9f5;
+  --txt:#1a1410;--txt2:#6b5c4e;--txt3:#9e8e7e;
+  --acc:#b5341a;--acc2:#d4622a;--acc3:#2a7a4a;
+  --acc-pale:#fdf0ec;--acc3-pale:#edf7f1;
+  --border:#ddd0c0;--border2:#c8b8a0;
+  --nav:rgba(242,237,230,0.95);
+  --shadow:0 2px 20px rgba(0,0,0,.07);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.12);
+  --r:18px;--r-sm:10px;
+}
+[data-theme="dark"]{
+  --bg:#0f0d0b;--bg2:#181510;--bg3:#1e1a14;
+  --card:#1e1a14;--card2:#231f18;
+  --txt:#f0e8de;--txt2:#a0907e;--txt3:#6a5e4e;
+  --acc:#e05030;--acc2:#e88040;--acc3:#3ab060;
+  --acc-pale:#2a1812;--acc3-pale:#12281a;
+  --border:#3a3025;--border2:#4a4030;
+  --nav:rgba(15,13,11,0.96);
+  --shadow:0 2px 20px rgba(0,0,0,.3);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.5);
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Syne',sans-serif;
+  background:var(--bg);color:var(--txt);
+  min-height:100vh;overflow-x:hidden;
+  transition:background .35s,color .35s;
+}
+
+/* ═══════════════════════ NAV ═══════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  height:68px;background:var(--nav);
+  backdrop-filter:blur(20px) saturate(1.5);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:0 2.5rem;gap:1rem;
+  transition:background .35s,border-color .35s;
+}
+.brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.6rem;font-weight:600;
+  color:var(--acc);cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  letter-spacing:-.3px;white-space:nowrap;
+}
+.brand-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--acc);display:inline-block;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.nav-center{display:flex;align-items:center;gap:.2rem}
+.nav-link{
+  background:none;border:none;
+  font-family:'Syne',sans-serif;font-size:.82rem;
+  font-weight:500;color:var(--txt2);
+  padding:8px 14px;border-radius:var(--r-sm);
+  cursor:pointer;letter-spacing:.3px;
+  transition:all .2s;white-space:nowrap;
+}
+.nav-link:hover{background:var(--bg2);color:var(--txt)}
+.nav-link.active{color:var(--acc)}
+.nav-right{display:flex;align-items:center;gap:.75rem}
+#themeBtn{
+  width:40px;height:40px;border-radius:50%;
+  border:1.5px solid var(--border);background:var(--card);
+  cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;color:var(--txt);
+}
+#themeBtn:hover{border-color:var(--acc);transform:rotate(20deg)}
+.btn-nav-auth{
+  background:var(--acc);color:#fff;
+  border:none;font-family:'Syne',sans-serif;
+  font-weight:600;font-size:.82rem;
+  padding:9px 20px;border-radius:100px;
+  cursor:pointer;letter-spacing:.3px;
+  transition:all .2s;
+}
+.btn-nav-auth:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ═══════════════════════ PAGES ═══════════════════════ */
+.page{display:none;min-height:100vh;padding-top:68px}
+.page.active{display:block;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════ BUTTONS ═══════════════════════ */
+.btn-primary{
+  background:var(--acc);color:#fff;border:none;
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:.9rem;padding:13px 28px;border-radius:100px;
+  cursor:pointer;letter-spacing:.3px;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(181,52,26,.35)}
+.btn-outline{
+  background:transparent;
+  border:1.5px solid var(--border2);color:var(--txt);
+  font-family:'Syne',sans-serif;font-weight:500;
+  font-size:.9rem;padding:12px 26px;border-radius:100px;
+  cursor:pointer;transition:all .2s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-outline:hover{border-color:var(--acc);color:var(--acc)}
+.btn-ghost{
+  background:none;border:none;color:var(--acc);
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:.88rem;cursor:pointer;padding:8px 0;
+  transition:opacity .2s;
+}
+.btn-ghost:hover{opacity:.7}
+
+/* ═══════════════════════ LANDING PAGE ═══════════════════════ */
+#landingPage{background:var(--bg)}
+.hero{
+  min-height:calc(100vh - 68px);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:4rem 1.5rem 3rem;
+  position:relative;overflow:hidden;
+}
+.hero-orbs{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18}
+.orb1{width:600px;height:600px;top:-200px;left:-150px;background:#b5341a}
+.orb2{width:500px;height:500px;bottom:-150px;right:-100px;background:#d4622a}
+.orb3{width:400px;height:400px;top:30%;left:55%;background:#2a7a4a}
+[data-theme="dark"] .orb{opacity:.25}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--acc-pale);border:1px solid var(--acc);
+  color:var(--acc);border-radius:100px;
+  padding:6px 20px;font-size:.75rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:2rem;
+  animation:fadeUp .6s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3rem,8vw,6rem);
+  line-height:1.05;max-width:820px;
+  margin-bottom:1.5rem;
+  animation:fadeUp .7s .1s ease both;
+  font-weight:600;
+}
+.hero h1 em{color:var(--acc);font-style:italic}
+.hero-sub{
+  font-size:1.05rem;color:var(--txt2);
+  max-width:480px;line-height:1.75;
+  margin-bottom:3rem;font-weight:400;
+  animation:fadeUp .7s .2s ease both;
+}
+.hero-cta{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  justify-content:center;margin-bottom:4rem;
+  animation:fadeUp .7s .3s ease both;
+}
+.hero-cta .btn-primary{font-size:1rem;padding:15px 36px}
+.hero-cta .btn-outline{font-size:1rem;padding:14px 32px}
+.plates-row{
+  display:flex;gap:1.5rem;justify-content:center;
+  flex-wrap:wrap;animation:fadeUp .8s .45s ease both;
+}
+.mini-plate{
+  width:100px;height:100px;border-radius:50%;
+  overflow:hidden;box-shadow:var(--shadow-lg);
+  cursor:pointer;transition:transform .3s ease;
+  position:relative;
+}
+.mini-plate:hover{transform:scale(1.12) rotate(4deg)}
+
+/* features */
+.features{
+  max-width:1100px;margin:0 auto;
+  padding:5rem 2rem;
+}
+.sec-label{
+  font-size:.7rem;font-weight:700;
+  letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--acc);margin-bottom:.75rem;
+}
+.sec-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.6rem;font-weight:600;
+  margin-bottom:3rem;max-width:500px;line-height:1.15;
+}
+.feat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1.25rem;
+}
+.feat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.75rem;
+  transition:transform .3s,box-shadow .3s;
+}
+.feat-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.feat-icon{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;margin-bottom:1.25rem;
+}
+.feat-card h3{font-size:1rem;font-weight:700;margin-bottom:.5rem;letter-spacing:.2px}
+.feat-card p{font-size:.875rem;color:var(--txt2);line-height:1.7}
+
+/* steps */
+.steps-section{max-width:860px;margin:0 auto;padding:3rem 2rem 6rem}
+.steps{display:flex;flex-direction:column;gap:1rem;margin-top:2rem}
+.step-row{
+  display:flex;align-items:flex-start;gap:1.25rem;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.5rem;
+  transition:border-color .2s;
+}
+.step-row:hover{border-color:var(--border2)}
+.step-num{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--acc);color:#fff;
+  font-weight:700;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.step-row h3{font-weight:700;font-size:.95rem;margin-bottom:.35rem}
+.step-row p{font-size:.875rem;color:var(--txt2);line-height:1.65}
+
+/* ═══════════════════════ AUTH PAGE ═══════════════════════ */
+#authPage{
+  display:none;min-height:100vh;padding-top:68px;
+  align-items:center;justify-content:center;
+  background:var(--bg);
+}
+#authPage.active{display:flex}
+.auth-outer{width:100%;max-width:440px;padding:2rem 1rem;margin:auto}
+.auth-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px;padding:2.5rem;
+  box-shadow:var(--shadow-lg);
+}
+.auth-top{text-align:center;margin-bottom:2rem}
+.auth-eye{font-size:2.5rem;margin-bottom:.75rem}
+.auth-top h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;font-weight:600;margin-bottom:.35rem;
+}
+.auth-top p{color:var(--txt2);font-size:.875rem}
+.tab-switch{
+  display:grid;grid-template-columns:1fr 1fr;
+  background:var(--bg2);border-radius:12px;
+  padding:4px;margin-bottom:2rem;gap:0;
+}
+.tab-btn{
+  background:none;border:none;
+  font-family:'Syne',sans-serif;font-weight:600;
+  font-size:.85rem;color:var(--txt2);
+  padding:10px;border-radius:9px;cursor:pointer;
+  transition:all .2s;letter-spacing:.3px;
+}
+.tab-btn.on{background:var(--card);color:var(--acc);box-shadow:var(--shadow)}
+.form-group{margin-bottom:1.15rem}
+.form-group label{
+  display:block;font-size:.78rem;font-weight:700;
+  color:var(--txt2);margin-bottom:.45rem;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.form-group input{
+  width:100%;background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:12px;padding:13px 16px;
+  font-family:'Syne',sans-serif;font-size:.9rem;
+  color:var(--txt);outline:none;
+  transition:border-color .2s,background .2s;
+}
+.form-group input:focus{border-color:var(--acc);background:var(--card)}
+.form-group input::placeholder{color:var(--txt3)}
+.auth-submit{
+  width:100%;padding:14px;border-radius:100px;
+  font-size:.95rem;margin-top:.25rem;justify-content:center;
+}
+.auth-msg{
+  border-radius:10px;padding:10px 14px;
+  font-size:.85rem;text-align:center;
+  margin-top:1rem;display:none;
+}
+.auth-msg.ok{background:var(--acc3-pale);color:var(--acc3)}
+.auth-msg.err{background:var(--acc-pale);color:var(--acc)}
+.form-hidden{display:none}
+
+/* ═══════════════════════ ABOUT PAGE ═══════════════════════ */
+#aboutPage{background:var(--bg)}
+.page-hero{
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:4rem 2rem 3rem;
+}
+.page-hero-inner{max-width:900px;margin:0 auto}
+.page-hero-inner h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;font-weight:600;margin-bottom:1rem;line-height:1.1;
+}
+.page-hero-inner p{color:var(--txt2);font-size:1rem;line-height:1.75;max-width:600px}
+.page-content{max-width:900px;margin:0 auto;padding:3rem 2rem}
+.type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.15rem;margin-bottom:3rem}
+.type-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.5rem;
+}
+.type-pill{
+  display:inline-block;padding:3px 12px;
+  border-radius:100px;font-size:.7rem;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  margin-bottom:.75rem;
+}
+.pill-red{background:var(--acc-pale);color:var(--acc)}
+.pill-green{background:var(--acc3-pale);color:var(--acc3)}
+.pill-blue{background:#e8f0fe;color:#1a56db}
+.pill-mono{background:#f3e8fe;color:#7c3aed}
+[data-theme="dark"] .pill-blue{background:#101d40;color:#93b4fd}
+[data-theme="dark"] .pill-mono{background:#1e1028;color:#c084fc}
+.type-card h4{font-weight:700;font-size:.95rem;margin-bottom:.4rem}
+.type-card p{font-size:.85rem;color:var(--txt2);line-height:1.6}
+.about-cta{
+  background:var(--acc);border-radius:var(--r);
+  padding:2.5rem;text-align:center;color:#fff;
+}
+.about-cta h3{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;margin-bottom:.6rem;
+}
+.about-cta p{opacity:.88;margin-bottom:1.5rem;font-size:.9rem;line-height:1.6}
+.btn-white{
+  background:#fff;color:var(--acc);border:none;
+  font-family:'Syne',sans-serif;font-weight:700;
+  font-size:.95rem;padding:13px 34px;border-radius:100px;
+  cursor:pointer;transition:all .2s;
+}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+
+/* ═══════════════════════ TEST PAGE ═══════════════════════ */
+#testPage{background:var(--bg)}
+.test-wrap{max-width:700px;margin:0 auto;padding:3rem 1.5rem}
+.prog-wrap{margin-bottom:2rem}
+.prog-bar-bg{
+  background:var(--bg2);border-radius:100px;
+  height:7px;overflow:hidden;margin-bottom:.6rem;
+}
+.prog-bar-fill{
+  height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));
+  border-radius:100px;transition:width .5s ease;
+}
+.prog-labels{
+  display:flex;justify-content:space-between;
+  font-size:.78rem;color:var(--txt2);font-weight:600;
+}
+.plate-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px;padding:2.5rem;
+  box-shadow:var(--shadow);text-align:center;
+}
+.plate-num{
+  font-size:.72rem;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:var(--txt2);margin-bottom:.5rem;
+}
+.plate-q{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.5rem;font-weight:600;
+  margin-bottom:.5rem;
+}
+.plate-hint{color:var(--txt2);font-size:.85rem;margin-bottom:2rem}
+.plate-canvas-wrap{
+  width:280px;height:280px;border-radius:50%;
+  margin:0 auto 2.5rem;overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,.15);
+  position:relative;
+}
+canvas.plate{width:100%;height:100%;display:block}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.opt-btn{
+  background:var(--bg2);
+  border:2px solid var(--border);
+  border-radius:14px;padding:15px 18px;
+  font-family:'Syne',sans-serif;font-size:.95rem;
+  font-weight:600;color:var(--txt);
+  cursor:pointer;transition:all .22s;
+}
+.opt-btn:hover:not(:disabled){
+  border-color:var(--acc);color:var(--acc);
+  background:var(--acc-pale);transform:translateY(-2px);
+}
+.opt-btn.correct{border-color:var(--acc3)!important;background:var(--acc3-pale)!important;color:var(--acc3)!important}
+.opt-btn.wrong{border-color:var(--acc)!important;background:var(--acc-pale)!important;color:var(--acc)!important}
+.opt-btn:disabled{cursor:default}
+.cant-see{
+  display:block;width:100%;margin-top:.8rem;
+  background:none;border:2px dashed var(--border);
+  border-radius:14px;padding:13px;
+  font-family:'Syne',sans-serif;font-size:.85rem;
+  color:var(--txt2);cursor:pointer;transition:all .2s;
+}
+.cant-see:hover:not(:disabled){border-color:var(--txt2);color:var(--txt)}
+.feedback{
+  margin-top:1rem;padding:12px 16px;border-radius:12px;
+  font-size:.875rem;font-weight:500;display:none;
+}
+.feedback.show{display:block}
+.feedback.ok{background:var(--acc3-pale);color:var(--acc3)}
+.feedback.bad{background:var(--acc-pale);color:var(--acc)}
+
+/* ═══════════════════════ RESULTS PAGE ═══════════════════════ */
+#resultsPage{background:var(--bg)}
+.results-wrap{max-width:780px;margin:0 auto;padding:3rem 1.5rem}
+.score-hero{text-align:center;margin-bottom:3rem}
+.ring-wrap{width:170px;height:170px;position:relative;margin:0 auto 1.5rem}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.ring-pct{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.5rem;font-weight:600;color:var(--acc);
+}
+.ring-lbl{font-size:.72rem;color:var(--txt2);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.results-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.2rem;font-weight:600;margin-bottom:.6rem;
+}
+.results-diag{color:var(--txt2);max-width:500px;margin:0 auto;line-height:1.7;font-size:.95rem}
+.result-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:2rem;margin-bottom:1.25rem;
+}
+.result-card h3{font-weight:700;font-size:1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+.answer-row{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.75rem 1rem;border-radius:10px;
+  background:var(--bg2);font-size:.875rem;margin-bottom:.5rem;
+}
+.answer-row:last-child{margin-bottom:0}
+.ans-n{font-weight:700;color:var(--txt2);min-width:30px;font-size:.78rem}
+.ans-icon{font-size:1rem}
+.ans-detail{flex:1;color:var(--txt)}
+.ans-correct{color:var(--txt3);font-size:.8rem}
+.results-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+.results-actions .btn-primary,.results-actions .btn-outline{flex:1;justify-content:center;padding:14px}
+
+/* ═══════════════════════ CORRECTION PAGE ═══════════════════════ */
+#correctionPage{background:var(--bg)}
+.correction-wrap{max-width:950px;margin:0 auto;padding:3rem 1.5rem}
+.correction-wrap .sec-title{max-width:none;margin-bottom:.75rem}
+.correction-sub{color:var(--txt2);font-size:.95rem;line-height:1.75;margin-bottom:2.5rem;max-width:620px}
+.upload-zone{
+  border:2.5px dashed var(--border2);
+  border-radius:var(--r);background:var(--card);
+  padding:4rem 2rem;text-align:center;
+  cursor:pointer;transition:all .25s;
+  margin-bottom:2rem;
+}
+.upload-zone:hover,.upload-zone.drag-over{
+  border-color:var(--acc);
+  background:var(--acc-pale);
+}
+.upload-icon{font-size:3.5rem;margin-bottom:1rem;opacity:.55}
+.upload-zone h3{font-size:1.1rem;font-weight:700;margin-bottom:.4rem}
+.upload-zone p{color:var(--txt2);font-size:.85rem}
+#fileInput{display:none}
+.correction-studio{display:none}
+.correction-studio.show{display:block;animation:fadeIn .4s ease}
+.filter-tabs{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.75rem}
+.filter-tab{
+  padding:9px 18px;border-radius:100px;
+  border:1.5px solid var(--border);background:var(--card);
+  font-family:'Syne',sans-serif;font-size:.8rem;
+  font-weight:600;color:var(--txt2);cursor:pointer;
+  letter-spacing:.3px;transition:all .2s;
+}
+.filter-tab:hover,.filter-tab.on{
+  border-color:var(--acc);color:var(--acc);background:var(--acc-pale);
+}
+.compare-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1.25rem;margin-bottom:1.5rem;
+}
+@media(max-width:640px){.compare-grid{grid-template-columns:1fr}}
+.img-panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.img-panel-head{
+  padding:.75rem 1.15rem;border-bottom:1px solid var(--border);
+  font-size:.82rem;font-weight:700;
+  display:flex;align-items:center;gap:.5rem;
+  color:var(--txt2);letter-spacing:.3px;
+}
+.img-panel img,.img-panel canvas{width:100%;display:block}
+.processing{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-height:200px;color:var(--txt2);gap:1rem;
+}
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid var(--border);
+  border-top-color:var(--acc);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.correction-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.correction-btns .btn-primary,.correction-btns .btn-outline{flex:1;justify-content:center}
+
+/* ═══════════════════════ PROFILE PAGE ═══════════════════════ */
+#profilePage{background:var(--bg)}
+.profile-wrap{max-width:700px;margin:0 auto;padding:3rem 1.5rem}
+.profile-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:24px;padding:2.5rem;
+  text-align:center;margin-bottom:1.25rem;
+  box-shadow:var(--shadow);
+}
+.avatar-ring{
+  width:88px;height:88px;border-radius:50%;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.4rem;font-weight:600;color:#fff;
+  margin:0 auto 1.25rem;
+}
+.profile-card h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;font-weight:600;margin-bottom:.25rem;
+}
+.profile-email{color:var(--txt2);font-size:.875rem}
+.stat-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1rem;margin-top:1.75rem;
+}
+.stat-box{background:var(--bg2);border-radius:14px;padding:1.25rem;text-align:center}
+.stat-val{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.9rem;font-weight:600;color:var(--acc);
+}
+.stat-lbl{font-size:.7rem;color:var(--txt2);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-top:.2rem}
+.history-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.75rem;
+  margin-bottom:1.25rem;
+}
+.history-card h3{font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem}
+.hist-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.8rem 0;border-bottom:1px solid var(--border);
+  font-size:.875rem;
+}
+.hist-row:last-child{border:none}
+.hist-date{color:var(--txt2);font-size:.8rem}
+.hist-score{font-weight:700;color:var(--acc)}
+.hist-diag{color:var(--txt2);font-size:.8rem;font-style:italic}
+.logout-btn{
+  width:100%;padding:13px;border-radius:100px;
+  background:none;border:2px solid var(--acc);
+  color:var(--acc);font-family:'Syne',sans-serif;
+  font-weight:700;font-size:.9rem;cursor:pointer;
+  letter-spacing:.3px;transition:all .2s;
+}
+.logout-btn:hover{background:var(--acc-pale)}
+
+/* ═══════════════════════ TOAST ═══════════════════════ */
+.toast{
+  position:fixed;bottom:2rem;right:2rem;z-index:9999;
+  background:var(--txt);color:var(--bg);
+  padding:13px 22px;border-radius:14px;
+  font-size:.875rem;font-weight:600;
+  box-shadow:var(--shadow-lg);
+  opacity:0;transform:translateY(16px);
+  transition:all .3s;pointer-events:none;
+  max-width:300px;
+}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ═══════════════════════ RESPONSIVE ═══════════════════════ */
+@media(max-width:700px){
+  nav{padding:0 1rem}
+  .nav-center{display:none}
+  .hero h1{font-size:2.6rem}
+  .plates-row{display:none}
+  .opts-grid{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .results-actions{flex-direction:column}
+  .correction-btns{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <div class="brand" onclick="goTo('landing')">
+    <div class="brand-dot"></div>TrueHue
+  </div>
+  <div class="nav-center">
+    <button class="nav-link active" onclick="goTo('landing')" data-p="landing">Home</button>
+    <button class="nav-link" onclick="goTo('about')" data-p="about">About</button>
+    <button class="nav-link" onclick="gateNav('test')" data-p="test">Take Test</button>
+    <button class="nav-link" onclick="gateNav('correction')" data-p="correction">Color Fix</button>
+    <button class="nav-link" onclick="gateNav('profile')" data-p="profile">Profile</button>
+  </div>
+  <div class="nav-right">
+    <button id="themeBtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <button class="btn-nav-auth" id="authNavBtn" onclick="goTo('auth')">Sign In</button>
+  </div>
+</nav>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════ LANDING ═══════════════════ -->
+<div id="landingPage" class="page active">
+  <section class="hero">
+    <div class="hero-orbs">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+    </div>
+    <div class="hero-tag">🔬 Ishihara-Based Clinical Test</div>
+    <h1>Discover How You <em>See</em> the World</h1>
+    <p class="hero-sub">A beautifully crafted colorblindness screening tool — powered by the trusted Ishihara method. Understand your color vision in minutes.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="gateNav('test')">Begin Test →</button>
+      <button class="btn-outline" onclick="goTo('about')">Learn More</button>
+    </div>
+    <div class="plates-row" id="previewRow"></div>
+  </section>
+
+  <section class="features">
+    <div class="sec-label">What's Inside</div>
+    <h2 class="sec-title">Everything you need to understand your vision</h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#fdf0ec">🎨</div>
+        <h3>24 Ishihara Plates</h3>
+        <p>Authentic dot-pattern plates designed to detect red-green and blue-yellow color perception deficiencies across all severity levels.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#edf7f1">🧬</div>
+        <h3>Instant Diagnosis</h3>
+        <p>Receive a personalized analysis identifying protanopia, deuteranopia, tritanopia, or confirming normal color vision.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#e8f0fe">🖼️</div>
+        <h3>Color Correction Studio</h3>
+        <p>Upload any image and apply scientifically-grounded daltonization filters — making visuals more accessible for your specific type.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon" style="background:#f3e8fe">📈</div>
+        <h3>History & Profile</h3>
+        <p>Your results are saved locally. Track your scores over time, compare diagnoses, and monitor changes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps-section">
+    <div class="sec-label">How It Works</div>
+    <h2 class="sec-title">Three steps to clarity</h2>
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div><h3>Create your account</h3><p>Register with just a name and email. All data is stored locally on this server — private and secure.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div><h3>Take the Ishihara test</h3><p>Work through 24 color plates at your own pace. No time pressure. Each plate has 4 answer choices — just pick what you see.</p></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div><h3>Get results & fix images</h3><p>Receive a clear diagnosis, review each plate, then use the Color Correction Studio to transform any image for your vision type.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════ AUTH ═══════════════════ -->
+<div id="authPage" class="page">
+  <div class="auth-outer">
+    <div class="auth-card">
+      <div class="auth-top">
+        <div class="auth-eye">👁️</div>
+        <h2>Welcome to TrueHue</h2>
+        <p>Sign in or create your account to begin</p>
+      </div>
+      <div class="tab-switch">
+        <button class="tab-btn on" onclick="authTab('login',this)">Sign In</button>
+        <button class="tab-btn" onclick="authTab('register',this)">Register</button>
+      </div>
+      <!-- LOGIN -->
+      <div id="loginForm">
+        <div class="form-group"><label>Email</label><input type="email" id="li-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="li-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn-primary auth-submit" onclick="doLogin()">Sign In →</button>
+      </div>
+      <!-- REGISTER -->
+      <div id="registerForm" class="form-hidden">
+        <div class="form-group"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your name"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="reg-pw" placeholder="Min 6 characters"></div>
+        <div class="form-group"><label>Confirm Password</label><input type="password" id="reg-pw2" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doRegister()"></div>
+        <button class="btn-primary auth-submit" onclick="doRegister()">Create Account →</button>
+      </div>
+      <div class="auth-msg" id="authMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ ABOUT ═══════════════════ -->
+<div id="aboutPage" class="page">
+  <div class="page-hero">
+    <div class="page-hero-inner">
+      <div class="sec-label">About Colorblindness</div>
+      <h2>Understanding Color Vision Deficiency</h2>
+      <p>Colorblindness affects roughly 1 in 12 men and 1 in 200 women globally. It doesn't mean seeing in black and white — it means certain colors appear similar or indistinguishable from each other.</p>
+    </div>
+  </div>
+  <div class="page-content">
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;margin-bottom:1.25rem">Types of Color Vision Deficiency</h3>
+    <div class="type-grid">
+      <div class="type-card">
+        <div class="type-pill pill-red">Protanopia</div>
+        <h4>Red-Blind</h4>
+        <p>Missing red cone cells. Reds appear very dark. Common — affects ~1% of males. Often confused with deuteranopia.</p>
+      </div>
+      <div class="type-card">
+        <div class="type-pill pill-green">Deuteranopia</div>
+        <h4>Green-Blind</h4>
+        <p>Missing green cone cells. Most common form. Green and red appear similar. Affects ~1% of males.</p>
+      </div>
+      <div class="type-card">
+        <div class="type-pill pill-blue">Tritanopia</div>
+        <h4>Blue-Blind</h4>
+        <p>Missing blue cone cells. Rare condition. Blue and green appear similar; red and pink look alike.</p>
+      </div>
+      <div class="type-card">
+        <div class="type-pill pill-mono">Achromatopsia</div>
+        <h4>Monochromacy</h4>
+        <p>Complete inability to perceive color. Extremely rare. Usually accompanied by light sensitivity (photophobia).</p>
+      </div>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;margin-bottom:1rem">The Ishihara Method</h3>
+    <p style="color:var(--txt2);line-height:1.8;margin-bottom:2.5rem">Developed by Dr. Shinobu Ishihara in 1917, the test uses pseudoisochromatic plates — circular images made of dots in varying colors and sizes. Hidden within the patterns are numbers that people with color vision deficiencies struggle to identify, because the number and background colors appear the same to them. Our digital version renders authentic dot patterns programmatically across 24 carefully designed plates.</p>
+    <div class="about-cta">
+      <h3>Ready to discover your color vision?</h3>
+      <p>The full test takes just 5–8 minutes. Ensure your screen brightness is at a comfortable level.</p>
+      <button class="btn-white" onclick="gateNav('test')">Start the Test →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TEST ═══════════════════ -->
+<div id="testPage" class="page">
+  <div class="test-wrap">
+    <div class="prog-wrap">
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-labels">
+        <span id="progLabel">Plate 1 of 24</span>
+        <span id="progPct">0%</span>
+      </div>
+    </div>
+    <div class="plate-card" id="plateCard">
+      <div class="plate-num" id="plateNum">Plate 1</div>
+      <div class="plate-q" id="plateQ">What number do you see?</div>
+      <div class="plate-hint" id="plateHint">Look carefully at the dot pattern</div>
+      <div class="plate-canvas-wrap">
+        <canvas class="plate" id="plateCanvas" width="280" height="280"></canvas>
+      </div>
+      <div class="opts-grid" id="optsGrid"></div>
+      <button class="cant-see" id="cantBtn" onclick="pickAnswer(null)">I cannot see any number</button>
+      <div class="feedback" id="feedback"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ RESULTS ═══════════════════ -->
+<div id="resultsPage" class="page">
+  <div class="results-wrap">
+    <div class="score-hero">
+      <div class="ring-wrap">
+        <svg width="170" height="170" viewBox="0 0 170 170">
+          <circle cx="85" cy="85" r="70" fill="none" stroke="var(--bg2)" stroke-width="13"/>
+          <circle cx="85" cy="85" r="70" fill="none" stroke="var(--acc)" stroke-width="13"
+            stroke-dasharray="439.82" stroke-dashoffset="439.82"
+            id="ringCircle" stroke-linecap="round" style="transition:stroke-dashoffset 1.2s ease"/>
+        </svg>
+        <div class="ring-inner">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-lbl">Correct</div>
+        </div>
+      </div>
+      <h2 class="results-title" id="resultsTitle">Your Results</h2>
+      <p class="results-diag" id="resultsDiag">Analyzing your responses...</p>
+    </div>
+    <div class="result-card">
+      <h3>📋 Answer Breakdown</h3>
+      <div id="answerList"></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn-primary" onclick="gateNav('correction')">Try Color Correction →</button>
+      <button class="btn-outline" onclick="retakeTest()">Retake Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ COLOR CORRECTION ═══════════════════ -->
+<div id="correctionPage" class="page">
+  <div class="correction-wrap">
+    <div class="sec-label">Studio</div>
+    <h2 class="sec-title" style="font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:600">Color Correction Studio</h2>
+    <p class="correction-sub">Upload any image and apply daltonization filters tuned for your specific type of color vision deficiency. The server processes your image using scientific color matrix transformations.</p>
+
+    <div class="upload-zone" id="uploadZone"
+      onclick="document.getElementById('fileInput').click()"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleDrop(event)">
+      <input type="file" id="fileInput" accept="image/*" onchange="loadFile(event)">
+      <div class="upload-icon">🖼️</div>
+      <h3>Drop your image here or click to browse</h3>
+      <p>JPG, PNG, WebP · Max 10MB · Processed server-side with Python + Pillow</p>
+    </div>
+
+    <div class="correction-studio" id="studio">
+      <div class="filter-tabs">
+        <button class="filter-tab on" onclick="applyFilter('normal',this)">👁 Original</button>
+        <button class="filter-tab" onclick="applyFilter('protanopia',this)">🔴 Protanopia Fix</button>
+        <button class="filter-tab" onclick="applyFilter('deuteranopia',this)">🟢 Deuteranopia Fix</button>
+        <button class="filter-tab" onclick="applyFilter('tritanopia',this)">🔵 Tritanopia Fix</button>
+        <button class="filter-tab" onclick="applyFilter('grayscale',this)">⬛ Grayscale Sim</button>
+        <button class="filter-tab" onclick="applyFilter('highcontrast',this)">✨ High Contrast</button>
+        <button class="filter-tab" onclick="applyFilter('warm',this)">🔆 Warm Shift</button>
+        <button class="filter-tab" onclick="applyFilter('cool',this)">❄️ Cool Shift</button>
+      </div>
+      <div class="compare-grid">
+        <div class="img-panel">
+          <div class="img-panel-head">📷 Original Image</div>
+          <img id="origImg" src="" alt="Original">
+        </div>
+        <div class="img-panel">
+          <div class="img-panel-head" id="filtLabel">🎨 Processed Image</div>
+          <div class="processing" id="processing">
+            <div class="spinner"></div>
+            <span>Processing with Python…</span>
+          </div>
+          <img id="filtImg" src="" alt="Filtered" style="display:none">
+        </div>
+      </div>
+      <div class="correction-btns">
+        <button class="btn-primary" onclick="downloadResult()">⬇ Download Corrected Image</button>
+        <button class="btn-outline" onclick="resetStudio()">Upload New Image</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PROFILE ═══════════════════ -->
+<div id="profilePage" class="page">
+  <div class="profile-wrap">
+    <div class="profile-card">
+      <div class="avatar-ring" id="avatarRing">?</div>
+      <h2 id="pName">—</h2>
+      <div class="profile-email" id="pEmail">—</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val" id="pTests">0</div><div class="stat-lbl">Tests Taken</div></div>
+        <div class="stat-box"><div class="stat-val" id="pBest">—</div><div class="stat-lbl">Best Score</div></div>
+        <div class="stat-box"><div class="stat-val" id="pLast">—</div><div class="stat-lbl">Last Score</div></div>
+      </div>
+    </div>
+    <div class="history-card">
+      <h3>📈 Test History</h3>
+      <div id="histList"></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+// ── State ──────────────────────────────────────────────
+let STATE = {
+  user: {{ 'null' if not user else ('{name:"' + user.name + '",email:"' + user.email + '"}') }},
+  dark: localStorage.getItem('cv-dark') === '1',
+  testIdx: 0,
+  testAnswers: [],
+  currentFile: null,
+  currentFilteredDataUrl: null,
+};
+
+// ── Ishihara Plates Data ────────────────────────────────
+const PLATES = [
+  {ans:"12", opts:["12","74","21","8"],   bg:"#b06030",fg:"#d4c050"},
+  {ans:"8",  opts:["8","3","6","9"],      bg:"#c07830",fg:"#56a040"},
+  {ans:"6",  opts:["6","5","9","2"],      bg:"#50a050",fg:"#c84030"},
+  {ans:"29", opts:["70","29","92","20"],  bg:"#a06830",fg:"#6090c0"},
+  {ans:"57", opts:["35","57","75","53"],  bg:"#c05040",fg:"#70a050"},
+  {ans:"5",  opts:["5","2","7","3"],      bg:"#508090",fg:"#c07030"},
+  {ans:"3",  opts:["3","8","5","6"],      bg:"#6060b0",fg:"#c0c040"},
+  {ans:"15", opts:["15","17","51","71"],  bg:"#b08050",fg:"#508060"},
+  {ans:"74", opts:["74","21","41","14"],  bg:"#a05050",fg:"#50a060"},
+  {ans:"2",  opts:["2","6","3","9"],      bg:"#7090c0",fg:"#c09030"},
+  {ans:"45", opts:["45","54","14","41"],  bg:"#c08040",fg:"#4070b0"},
+  {ans:"7",  opts:["7","1","4","9"],      bg:"#a06040",fg:"#507090"},
+  {ans:"16", opts:["16","61","26","62"],  bg:"#b05040",fg:"#50a050"},
+  {ans:"73", opts:["73","37","17","71"],  bg:"#609050",fg:"#c07030"},
+  {ans:"5",  opts:["5","2","6","8"],      bg:"#5080b0",fg:"#c09040"},
+  {ans:"26", opts:["62","26","28","82"],  bg:"#c07050",fg:"#60a040"},
+  {ans:"42", opts:["42","24","14","41"],  bg:"#a05030",fg:"#4080c0"},
+  {ans:"35", opts:["35","53","85","58"],  bg:"#509060",fg:"#c07040"},
+  {ans:"96", opts:["96","69","68","86"],  bg:"#c08060",fg:"#508080"},
+  {ans:"4",  opts:["4","7","1","9"],      bg:"#6070b0",fg:"#b0a030"},
+  {ans:"9",  opts:["9","4","6","8"],      bg:"#a06030",fg:"#50a060"},
+  {ans:"13", opts:["13","31","17","71"],  bg:"#b05030",fg:"#5090b0"},
+  {ans:"6",  opts:["6","8","5","9"],      bg:"#508050",fg:"#c06030"},
+  {ans:"17", opts:["17","71","14","41"],  bg:"#9070a0",fg:"#70c060"},
+];
+
+// ── Seeded RNG ─────────────────────────────────────────
+function cyrb128(s){let a=1779033703,b=3144134277,c=1013904242,d=2773480762;for(let i=0,k;i<s.length;i++){k=s.charCodeAt(i);a=b^Math.imul(a^k,597399067);b=c^Math.imul(b^k,2869860233);c=d^Math.imul(c^k,951274213);d=a^Math.imul(d^k,2716044179)}a=Math.imul(c^(a>>>18),597399067);b=Math.imul(d^(b>>>22),2869860233);c=Math.imul(a^(c>>>17),951274213);d=Math.imul(b^(d>>>19),2716044179);return(a^b^c^d)>>>0}
+function mkRng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+// ── Canvas Plate Drawing ───────────────────────────────
+function hexBlend(hex, f){
+  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.min(255,r*f|0)},${Math.min(255,g*f|0)},${Math.min(255,b*f|0)})`;
+}
+function drawPlate(canvas, plate){
+  const W=canvas.width, R=W/2;
+  const ctx=canvas.getContext('2d');
+  const rng=mkRng(cyrb128(plate.ans+plate.bg));
+  ctx.clearRect(0,0,W,W);
+  ctx.save(); ctx.beginPath(); ctx.arc(R,R,R,0,Math.PI*2); ctx.clip();
+  ctx.fillStyle=plate.bg; ctx.fillRect(0,0,W,W);
+  // background noise
+  for(let i=0;i<900;i++){
+    const x=rng()*W,y=rng()*W,r=rng()*6+2;
+    if((x-R)**2+(y-R)**2>(R-r)**2) continue;
+    ctx.fillStyle=hexBlend(plate.bg,rng()*.5+.6);
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+  // render number to temp canvas to get pixel mask
+  const tc=document.createElement('canvas');tc.width=W;tc.height=W;
+  const tx=tc.getContext('2d');
+  tx.font=`bold ${R*.76}px Georgia`; tx.textAlign='center'; tx.textBaseline='middle';
+  tx.fillStyle='#000'; tx.fillText(plate.ans,R,R);
+  const px=tx.getImageData(0,0,W,W).data;
+  // dot pattern
+  for(let i=0;i<700;i++){
+    const x=rng()*W,y=rng()*W;
+    if((x-R)**2+(y-R)**2>(R-4)**2) continue;
+    const pi=(Math.round(y)*W+Math.round(x))*4;
+    const isNum=px[pi+3]>100;
+    const r2=rng()*7+3.5;
+    ctx.fillStyle=isNum?hexBlend(plate.fg,rng()*.3+.9):hexBlend(plate.bg,rng()*.4+.5);
+    ctx.beginPath(); ctx.arc(x,y,r2,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ── Preview Plates ─────────────────────────────────────
+function buildPreviews(){
+  const row=document.getElementById('previewRow'); if(!row) return;
+  [0,2,5,9,14].forEach(i=>{
+    const d=document.createElement('div'); d.className='mini-plate';
+    const cv=document.createElement('canvas'); cv.width=100; cv.height=100;
+    d.appendChild(cv); row.appendChild(d);
+    drawPlate(cv, PLATES[i]);
+  });
+}
+
+// ── Page Router ────────────────────────────────────────
+function goTo(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(name+'Page').classList.add('active');
+  document.querySelectorAll('[data-p]').forEach(l=>l.classList.toggle('active',l.dataset.p===name));
+  if(name==='test') startTest();
+  if(name==='results') showResults();
+  if(name==='profile') loadProfile();
+  window.scrollTo(0,0);
+}
+function gateNav(page){
+  if(!STATE.user){ showToast('Please sign in first'); goTo('auth'); return; }
+  goTo(page);
+}
+
+// ── Theme ──────────────────────────────────────────────
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', STATE.dark?'dark':'light');
+  document.getElementById('themeBtn').textContent = STATE.dark?'☀️':'🌙';
+}
+function toggleTheme(){
+  STATE.dark=!STATE.dark;
+  localStorage.setItem('cv-dark',STATE.dark?'1':'0');
+  applyTheme();
+}
+applyTheme();
+
+// ── Toast ──────────────────────────────────────────────
+function showToast(msg, dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+// ── Auth UI ────────────────────────────────────────────
+function authTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('loginForm').classList.toggle('form-hidden',tab!=='login');
+  document.getElementById('registerForm').classList.toggle('form-hidden',tab!=='register');
+  document.getElementById('authMsg').style.display='none';
+}
+function authMsg(msg,type){
+  const el=document.getElementById('authMsg');
+  el.textContent=msg; el.className='auth-msg '+(type||'err');
+  el.style.display='block';
+}
+
+async function doLogin(){
+  const email=document.getElementById('li-email').value.trim();
+  const pw=document.getElementById('li-pw').value;
+  if(!email||!pw){ authMsg('Please fill in all fields'); return; }
+  const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pw})});
+  const d=await res.json();
+  if(d.ok){
+    STATE.user={name:d.name,email};
+    updateNavAuth();
+    authMsg('Welcome back, '+d.name+'!','ok');
+    setTimeout(()=>goTo('landing'),900);
+  } else { authMsg(d.msg); }
+}
+
+async function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pw=document.getElementById('reg-pw').value;
+  const pw2=document.getElementById('reg-pw2').value;
+  if(!name||!email||!pw||!pw2){ authMsg('Please fill in all fields'); return; }
+  if(pw.length<6){ authMsg('Password must be at least 6 characters'); return; }
+  if(pw!==pw2){ authMsg('Passwords do not match'); return; }
+  const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pw})});
+  const d=await res.json();
+  if(d.ok){
+    STATE.user={name:d.name,email};
+    updateNavAuth();
+    authMsg('Account created! Welcome, '+d.name+'!','ok');
+    setTimeout(()=>goTo('about'),1000);
+  } else { authMsg(d.msg); }
+}
+
+function doLogout(){ window.location.href='/logout'; }
+
+function updateNavAuth(){
+  const btn=document.getElementById('authNavBtn');
+  if(STATE.user){
+    btn.textContent=STATE.user.name.split(' ')[0];
+    btn.onclick=()=>gateNav('profile');
+  } else {
+    btn.textContent='Sign In';
+    btn.onclick=()=>goTo('auth');
+  }
+}
+updateNavAuth();
+
+// ── Test Engine ────────────────────────────────────────
+function startTest(){
+  STATE.testIdx=0; STATE.testAnswers=[];
+  renderPlate();
+}
+function renderPlate(){
+  const i=STATE.testIdx, p=PLATES[i];
+  const total=PLATES.length;
+  const pct=Math.round(i/total*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLabel').textContent=`Plate ${i+1} of ${total}`;
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('plateNum').textContent=`Plate ${i+1}`;
+  document.getElementById('plateQ').textContent='What number do you see?';
+  document.getElementById('plateHint').textContent='Study the dot pattern carefully';
+  document.getElementById('feedback').className='feedback';
+  const cantBtn=document.getElementById('cantBtn');
+  cantBtn.disabled=false; cantBtn.style.opacity='1';
+  // draw plate
+  const cv=document.getElementById('plateCanvas');
+  drawPlate(cv, p);
+  // options
+  const grid=document.getElementById('optsGrid');
+  grid.innerHTML='';
+  // shuffle options but keep consistent
+  const opts=[...p.opts];
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt-btn'; b.textContent=o;
+    b.onclick=()=>pickAnswer(o);
+    grid.appendChild(b);
+  });
+}
+function pickAnswer(val){
+  const p=PLATES[STATE.testIdx];
+  const correct=val===p.ans;
+  STATE.testAnswers.push({plate:STATE.testIdx+1,given:val,correct:p.ans,ok:correct});
+  // visual feedback
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===p.ans) b.classList.add('correct');
+    else if(b.textContent===val) b.classList.add('wrong');
+  });
+  document.getElementById('cantBtn').disabled=true;
+  document.getElementById('cantBtn').style.opacity='.5';
+  const fb=document.getElementById('feedback');
+  fb.className='feedback show '+(correct?'ok':'bad');
+  fb.textContent=correct?'✓ Correct!':'✗ The number was '+p.ans;
+  setTimeout(()=>{
+    STATE.testIdx++;
+    if(STATE.testIdx>=PLATES.length){ finishTest(); }
+    else { renderPlate(); }
+  }, correct?900:1400);
+}
+async function finishTest(){
+  const score=STATE.testAnswers.filter(a=>a.ok).length;
+  const total=PLATES.length;
+  const pct=Math.round(score/total*100);
+  let diag;
+  if(pct>=85) diag='Normal color vision — you can distinguish colors well.';
+  else if(pct>=65) diag='Mild color vision deficiency — likely protanomaly or deuteranomaly.';
+  else if(pct>=40) diag='Moderate deficiency — possible protanopia or deuteranopia.';
+  else diag='Significant color vision deficiency — may include tritanopia or achromatopsia.';
+  if(STATE.user){
+    await fetch('/save_result',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({score,total,diagnosis:diag})});
+  }
+  goTo('results');
+}
+function showResults(){
+  const answers=STATE.testAnswers;
+  if(!answers.length) return;
+  const score=answers.filter(a=>a.ok).length;
+  const total=answers.length;
+  const pct=Math.round(score/total*100);
+  // ring
+  const circumference=439.82;
+  const offset=circumference-(circumference*pct/100);
+  setTimeout(()=>{
+    document.getElementById('ringCircle').style.strokeDashoffset=offset;
+    document.getElementById('ringPct').textContent=pct+'%';
+  },200);
+  // diagnosis
+  let title,diag;
+  if(pct>=85){ title='Excellent Color Vision 🎉'; diag='Your responses suggest normal color vision. You distinguish colors accurately across the spectrum.'; }
+  else if(pct>=65){ title='Mild Color Deficiency'; diag='You may have a mild form of protanomaly or deuteranomaly. Colors in the red-green spectrum can appear similar.'; }
+  else if(pct>=40){ title='Moderate Deficiency Detected'; diag='You likely have protanopia or deuteranopia — a moderate red-green color vision deficiency.'; }
+  else { title='Significant Deficiency Detected'; diag='Your responses suggest a significant color vision deficiency. Consider consulting an eye care professional.'; }
+  document.getElementById('resultsTitle').textContent=title;
+  document.getElementById('resultsDiag').textContent=`Score: ${score}/${total} (${pct}%) — ${diag}`;
+  // answer list
+  const list=document.getElementById('answerList');
+  list.innerHTML=answers.map((a,i)=>`
+    <div class="answer-row">
+      <span class="ans-n">P${a.plate}</span>
+      <span class="ans-icon">${a.ok?'✅':'❌'}</span>
+      <span class="ans-detail">${a.ok?`You answered: ${a.given}`:`You said: ${a.given||'nothing'}`}</span>
+      ${!a.ok?`<span class="ans-correct">Answer: ${a.correct}</span>`:''}
+    </div>`).join('');
+}
+function retakeTest(){ STATE.testIdx=0; STATE.testAnswers=[]; goTo('test'); }
+
+// ── Color Correction ───────────────────────────────────
+function loadFile(evt){
+  const file=evt.target.files[0]; if(!file) return;
+  STATE.currentFile=file;
+  const url=URL.createObjectURL(file);
+  document.getElementById('origImg').src=url;
+  document.getElementById('uploadZone').style.display='none';
+  document.getElementById('studio').classList.add('show');
+  applyFilter('normal', document.querySelector('.filter-tab'));
+}
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag-over');
+  const file=e.dataTransfer.files[0];
+  if(!file||!file.type.startsWith('image/')) return;
+  STATE.currentFile=file;
+  // fake input event
+  const dt=new DataTransfer(); dt.items.add(file);
+  document.getElementById('fileInput').files=dt.files;
+  loadFile({target:{files:[file]}});
+}
+
+let activeFilterTab=null;
+async function applyFilter(mode, btn){
+  if(!STATE.currentFile) return;
+  if(activeFilterTab) activeFilterTab.classList.remove('on');
+  if(btn){ btn.classList.add('on'); activeFilterTab=btn; }
+  const filtImg=document.getElementById('filtImg');
+  const proc=document.getElementById('processing');
+  filtImg.style.display='none'; proc.style.display='flex';
+  const labels={'normal':'👁 Original','protanopia':'🔴 Protanopia Corrected','deuteranopia':'🟢 Deuteranopia Corrected','tritanopia':'🔵 Tritanopia Corrected','grayscale':'⬛ Grayscale Simulation','highcontrast':'✨ High Contrast','warm':'🔆 Warm Shift','cool':'❄️ Cool Shift'};
+  document.getElementById('filtLabel').textContent=labels[mode]||mode;
+  const fd=new FormData();
+  fd.append('image',STATE.currentFile);
+  fd.append('mode',mode);
+  try{
+    const res=await fetch('/correct_image',{method:'POST',body:fd});
+    const d=await res.json();
+    if(d.ok){
+      const src='data:image/png;base64,'+d.image;
+      filtImg.src=src;
+      STATE.currentFilteredDataUrl=src;
+      proc.style.display='none'; filtImg.style.display='block';
+    } else { showToast('Error processing image'); proc.style.display='none'; }
+  } catch(e){ showToast('Server error — make sure Flask is running'); proc.style.display='none'; }
+}
+function downloadResult(){
+  if(!STATE.currentFilteredDataUrl){ showToast('Process an image first'); return; }
+  const a=document.createElement('a');
+  a.href=STATE.currentFilteredDataUrl;
+  a.download='TrueHue_corrected.png';
+  a.click();
+}
+function resetStudio(){
+  document.getElementById('uploadZone').style.display='';
+  document.getElementById('studio').classList.remove('show');
+  document.getElementById('fileInput').value='';
+  STATE.currentFile=null; STATE.currentFilteredDataUrl=null;
+}
+
+// ── Profile ────────────────────────────────────────────
+async function loadProfile(){
+  const res=await fetch('/get_profile');
+  const d=await res.json();
+  if(!d.ok){ showToast('Please sign in'); goTo('auth'); return; }
+  document.getElementById('pName').textContent=d.name;
+  document.getElementById('pEmail').textContent=d.email;
+  document.getElementById('avatarRing').textContent=d.name[0].toUpperCase();
+  const hist=d.history||[];
+  document.getElementById('pTests').textContent=hist.length;
+  if(hist.length){
+    const scores=hist.map(h=>h.score/h.total*100);
+    document.getElementById('pBest').textContent=Math.round(Math.max(...scores))+'%';
+    document.getElementById('pLast').textContent=Math.round(scores[scores.length-1])+'%';
+    document.getElementById('histList').innerHTML=hist.slice().reverse().map(h=>`
+      <div class="hist-row">
+        <div><div style="font-weight:600">${h.score}/${h.total} correct</div><div class="hist-date">${h.date}</div></div>
+        <div style="text-align:right"><div class="hist-score">${Math.round(h.score/h.total*100)}%</div><div class="hist-diag">${h.diagnosis.split(' — ')[0]}</div></div>
+      </div>`).join('');
+  } else {
+    document.getElementById('histList').innerHTML=`<p style="color:var(--txt2);font-size:.9rem">No tests yet. <button class="btn-ghost" onclick="gateNav('test')">Take your first test →</button></p>`;
+  }
+}
+
+// ── Boot ───────────────────────────────────────────────
+buildPreviews();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "mizzyshaikh1206@gmail.com": {
+    "name": "Misbah",
+    "email": "mizzyshaikh1206@gmail.com",
+    "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "history": [
+      {
+        "date": "2026-04-22 13:12",
+        "score": 22,
+        "total": 24,
+        "diagnosis": "Normal color vision \u2014 you can distinguish colors well."
+      },
+      {
+        "date": "2026-04-22 14:16",
+        "score": 17,
+        "total": 24,
+        "diagnosis": "Mild color vision deficiency \u2014 likely protanomaly or deuteranomaly."
+      }
+    ],
+    "joined": "2026-04-22"
+  }
+}
